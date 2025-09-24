@@ -17,7 +17,7 @@ MAX_ENTRIES_PER_RUN = 5  # allow up to 5 per "batch" (paper-style)
 WAVELENGTHS = np.arange(300, 801, 2)  # 300–800 nm UV-Vis window
 
 SOLVENTS = ["2MeTHF", "Toluene", "Chloroform"]
-POLYMER_CONCENTRATION = [0.01, 0.05, 0.10,]  # Need to confirm the UV-Vis spectra of the conc
+POLYMER_CONCENTRATION = [0.01, 0.05, 0.10]  # mg/mL (display only for now)
 ACIDS = ["HCl", "TFA"]
 ACID_CONCENTRATION = ["50x", "100x", "300x", "600x", "900x"]  # "x" relative to imine
 
@@ -97,7 +97,7 @@ def reset_for_new_attempt():
     # keep survey/consent so the user doesn't have to refill; uncomment to clear:
     # ss.survey = {}
     # ss.consented = False
-    ss.page = "Welcome"  # jump right back to builder for a fresh run
+    ss.page = "Welcome"  # go back to Welcome for a fresh run
 
 # ----------------------------
 # SIMPLE SIMULATOR
@@ -172,8 +172,9 @@ def sidebar():
     # live time readout (it will tick because main() re-runs once/second while running)
     st.sidebar.markdown("### ⏱️ " + pretty_hms(elapsed_seconds()))
 
-    # page navigation
+    # page navigation (include Welcome at the top)
     pages = [
+        "Welcome",
         "Survey",
         "Instructions",
         "Experiment Builder",
@@ -198,21 +199,22 @@ def sidebar():
 # ----------------------------
 def page_welcome():
     st.title("Welcome")
-    st. write(
+    st.write(
         """
-        **Welcome to the Degradation Challenge Game!**
-        This game is part of the human vs. robot research project for self-driving laboratores (SDLs) in polymer chemistry.
-        The goal of the study is establish performance benchmarks that would offer insights for the implementation of SDLs in polymer research.
-        You will be 
-        The approximate time to complete the game is 30-45 minutes.
-        Your background information and game data will be collected for research purposes only (learn more about the terms and consent in the *Survey* page).
-        You can remain anonymous if you prefer.
-        Thank you for your pariticipation and contribution to SDL research!
+**Welcome to the Degradation Challenge Game!**  
+This game is part of a research project on decision-making for self-driving laboratories (SDLs) in polymer chemistry.  
+Your goal will be to choose experimental conditions to achieve **complete degradation** close to a **target of 3 hours**.
 
-        **Please proceed to the *Survey* to get started.**
-        """)
-    if st.button("Survey", use_container_width=True):
+- Estimated time: 30–45 minutes  
+- Your background info and game data are for research only (see Terms & Consent in the **Survey**).  
+- You may remain anonymous if you prefer.
+
+**When you’re ready, continue to the Survey.**
+        """
+    )
+    if st.button("➡️ Go to Survey", use_container_width=True):
         st.session_state.page = "Survey"
+        st.rerun()
 
 def page_survey():
     st.title("Survey")
@@ -262,11 +264,11 @@ def page_instructions():
     st.subheader("Rules")
     st.write(
         """
-        - Build experiments on the **"Experiment Builder"** page.  
-        - You can add multiple entries; run them to see results.  
-        - Each run will return spectra for your entries.  
-        - No AI tools during gameplay. Take notes if you like.  
-        - When done, go to **"End Experiment"** to stop the timer and download your data.
+- Build experiments on the **Experiment Builder** page.  
+- You can add multiple entries; run them to see results.  
+- Each run returns spectra for your entries.  
+- No AI tools during gameplay. Take notes if you like.  
+- When done, go to **End Experiment** to stop the timer and download your data.
         """
     )
 
@@ -292,27 +294,26 @@ def page_builder():
     with c1:
         solvent = st.selectbox("Solvent", SOLVENTS, index=0)
     with c2:
-        conc = st.selectbox("Polymer Concentration(mg/mL)", POLYMER_CONCENTRATION, index=0)
+        conc = st.selectbox("Polymer Concentration (mg/mL)", POLYMER_CONCENTRATION, index=0)
     with c3:
         acid = st.selectbox("Acid Type", ACIDS, index=0)
     with c4:
-        mult = st.selectbox(
-            "Acid Concentration*",
-            ACID_CONCENTRATION,
-            index=2
-        )
-    st.write("*Acid molar excess relative to imine groups in polymer.")
-    c4, c5, c6 = st.columns([1, 3, 1])
-    with c4:
+        acid_conc = st.selectbox("Acid Concentration*", ACID_CONCENTRATION, index=2)
+
+    st.caption("*Acid molar excess relative to imine groups in polymer.")
+
+    col_left, col_spacer, col_right = st.columns([1, 3, 1])
+    with col_left:
         if st.button("➕ Add Entry"):
             st.session_state.pending_entries.append(dict(
                 entry_id=f"{st.session_state.survey.get('name','anon')}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
                 solvent=solvent,
                 polymer_conc=conc,
                 acid=acid,
-                acid_conc=mult,
+                acid_conc=acid_conc,
+                added_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
             ))
-    with c6:
+    with col_right:
         if st.button("🧹 Clear Pending"):
             st.session_state.pending_entries = []
 
@@ -324,27 +325,29 @@ def page_builder():
     else:
         st.caption("No pending entries yet.")
 
-    # ✅ Run limit message (only appears on this page now)
-    st.markdown(f"You can run up to {MAX_ENTRIES_PER_RUN} entries at a time.")
+    # Run limit message (only appears on this page)
+    st.subheader(f"You can run up to {MAX_ENTRIES_PER_RUN} entries at a time.")
 
     # Run button
     can_run = 0 < len(st.session_state.pending_entries) <= MAX_ENTRIES_PER_RUN
     if st.button("▶️ Run Experiments", disabled=not can_run):
         rows = []
         for e in st.session_state.pending_entries:
-            hours = base_degradation_time(e["solvent"], e["acid"], e["acid_mult"])
+            # Use the stored keys consistently
+            hours = base_degradation_time(e["solvent"], e["acid"], e["acid_conc"])
             spec = simulate_uvvis(hours)  # numpy array
             rows.append(dict(
                 session_id=st.session_state.session_id,
                 entry_id=e["entry_id"],
                 solvent=e["solvent"],
+                polymer_conc=e["polymer_conc"],
                 acid=e["acid"],
-                acid_mult=e["acid_mult"],
+                acid_conc=e["acid_conc"],
                 degradation_hours=hours,
                 closeness=closeness_score(hours),
                 wavelengths=";".join(map(str, WAVELENGTHS.tolist())),
                 absorbance=";".join(map(lambda x: f"{x:.4f}", spec.tolist())),
-                run_at=datetime.utcnow().isoformat()
+                run_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
             ))
         st.session_state.results.extend(rows)
         st.session_state.pending_entries = []
@@ -358,23 +361,25 @@ def page_results():
 
     # Table of results
     df = pd.DataFrame(st.session_state.results)
-    show_cols = ["entry_id", "solvent", "acid", "acid_mult", "degradation_hours", "closeness", "run_at"]
+    show_cols = ["entry_id", "solvent", "polymer_conc", "acid", "acid_conc",
+                 "degradation_hours", "closeness", "run_at"]
     st.dataframe(df[show_cols].sort_values("run_at"), use_container_width=True)
 
-    st.title("---")
+    st.markdown("---")
     st.subheader("View Spectrum for a Result")
+
     # pick an entry to plot
     entry_ids = [r["entry_id"] for r in st.session_state.results]
     sel = st.selectbox("Choose an entry", entry_ids)
 
     rec = next(r for r in st.session_state.results if r["entry_id"] == sel)
-    # decode spectrum
     lam = np.array(list(map(float, rec["wavelengths"].split(";"))))
     absorb = np.array(list(map(float, rec["absorbance"].split(";"))))
 
     st.caption(
-        f"Solvent: {rec['solvent']} | Acid: {rec['acid']} | Conc: {rec['acid_mult']} "
-        f"| Degradation ~ {rec['degradation_hours']} h (closeness={rec['closeness']})"
+        f"Solvent: {rec['solvent']} | Polymer Conc: {rec['polymer_conc']} mg/mL | "
+        f"Acid: {rec['acid']} ({rec['acid_conc']}) | "
+        f"Degradation ~ {rec['degradation_hours']} h (closeness={rec['closeness']})"
     )
 
     # Plot with matplotlib (Streamlit integrates automatically)
@@ -448,12 +453,11 @@ def page_end():
         st.info("No experiment results to export.")
 
     st.markdown("---")
-    # Optional: New Attempt button (resets state and goes back to Builder)
     if st.button("New Attempt", use_container_width=True):
         reset_for_new_attempt()
         st.rerun()
 
-    st.caption("You can start a new attempt above (redirects to *Experiment Builder* and restarts the timer) or close the app.")
+    st.caption("You can start a new attempt above (redirects to *Welcome*) or close the app.")
 
 # ----------------------------
 # MAIN
@@ -469,7 +473,9 @@ def main():
 
     # Router
     page = st.session_state.page
-    if page == "Survey":
+    if page == "Welcome":
+        page_welcome()
+    elif page == "Survey":
         page_survey()
     elif page == "Instructions":
         page_instructions()
@@ -482,7 +488,7 @@ def main():
     elif page == "End Experiment":
         page_end()
     else:
-        page_survey()
+        page_welcome()
 
     # 🔁 After rendering everything, schedule a tick if the timer is running
     if st.session_state.get("timer_running", False) and not st.session_state.get("ended", False):
