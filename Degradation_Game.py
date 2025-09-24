@@ -78,6 +78,22 @@ def pretty_hms(seconds: float) -> str:
     sec = s % 60
     return f"{h:02d}:{m:02d}:{sec:02d}"
 
+def reset_for_new_attempt():
+    """Clear results and pending entries, reset timer and flags, and mint a new session."""
+    ss = st.session_state
+    ss.session_id = str(uuid.uuid4())
+    ss.pending_entries = []
+    ss.results = []
+    ss.timer_started_at = None
+    ss.timer_stopped_at = None
+    ss.timer_running = False
+    ss.first_opened_builder_at = None
+    ss.ended = False
+    # keep survey/consent so the user doesn't have to refill; remove next 2 lines if you want to clear survey too
+    # ss.survey = {}
+    # ss.consented = False
+    ss.page = "Experiment Builder"  # jump right back to builder for a fresh run
+
 # ----------------------------
 # SIMPLE SIMULATOR
 # ----------------------------
@@ -246,7 +262,7 @@ def page_builder():
     with c2:
         acid = st.selectbox("Acid Type", ACIDS, index=0)
     with c3:
-        mult = st.selectbox("Acid Concentration (*molar excess of imine)", ACID_MULTIPLIER, index=2)
+        mult = st.selectbox("Acid Concentration (*molar excess of imine)", ACID_CONCENTRATION, index=2)
 
     c4, c5 = st.columns([1, 1])
     with c4:
