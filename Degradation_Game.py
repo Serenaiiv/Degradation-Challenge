@@ -66,10 +66,16 @@ def stop_timer():
 
 def elapsed_seconds():
     ss = st.session_state
-    if ss.timer_running and ss.timer_started_at:
-        return now_epoch() - ss.timer_started_at
-    elif ss.timer_stopped_at and ss.timer_started_at:
-        return ss.timer_stopped_at - ss.timer_started_at
+    start = ss.get("timer_started_at")
+    stop = ss.get("timer_stopped_at")
+    running = ss.get("timer_running", False)
+
+    if start is None:
+        return 0.0
+    if running:
+        return max(0.0, now_epoch() - float(start))
+    if stop is not None:
+        return max(0.0, float(stop) - float(start))
     return 0.0
 
 def pretty_hms(seconds: float) -> str:
@@ -433,6 +439,8 @@ def page_end():
 def main():
     st.set_page_config(page_title=APP_TITLE, layout="wide")
     init_state()
+    if st.session_state.get("timer_running", False) and not st.session_state.get("ended", False):
+        st_autorefresh(interval=1000, key=f"tick-{st.session_state.session_id}")
     sidebar()
 
     # top header across pages
