@@ -283,7 +283,7 @@ def page_builder():
             ACID_CONCENTRATION,
             index=2
         )
-    st.markdown("* Acid molar excess relative to imine groups in polymer.")
+    st.markdown("*Acid molar excess relative to imine groups in polymer.")
     c4, c5, c6 = st.columns([1, 3, 1])
     with c4:
         if st.button("➕ Add Entry"):
