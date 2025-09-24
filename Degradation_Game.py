@@ -201,7 +201,7 @@ def page_survey():
     st.write("Please provide basic info. Consent is required to proceed.")
 
     # External link to your Terms/Consent page
-    st.title(
+    st.write(
         "📄 **Read the Terms & Consent**: "
         "[Terms](https://utoronto-my.sharepoint.com/:w:/g/personal/serenazuyun_qiu_mail_utoronto_ca/EVrw_cgiBVdGg7T7Jr5mqhABApoJ5u5QJ_3s_QIMAHcKYQ?e=Y6YXin)"
     )
