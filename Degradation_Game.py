@@ -201,7 +201,7 @@ def page_survey():
     st.write("Please provide basic info. Consent is required to proceed.")
 
     # External link to your Terms/Consent page
-    st.markdown(
+    st.title(
         "📄 **Read the Terms & Consent**: "
         "[Terms](https://utoronto-my.sharepoint.com/:w:/g/personal/serenazuyun_qiu_mail_utoronto_ca/EVrw_cgiBVdGg7T7Jr5mqhABApoJ5u5QJ_3s_QIMAHcKYQ?e=Y6YXin)"
     )
@@ -242,7 +242,7 @@ def page_instructions():
     )
 
     st.subheader("Rules")
-    st.markdown(
+    st.title(
         """
         - Build experiments on the **Experiment Builder** page.  
         - You can add multiple entries; run them to see results.  
@@ -305,7 +305,7 @@ def page_builder():
         st.caption("No pending entries yet.")
 
     # ✅ Run limit message (only appears on this page now)
-    st.markdown(f"**You can run up to {MAX_ENTRIES_PER_RUN} entries at a time.**")
+    st.title(You can run up to {MAX_ENTRIES_PER_RUN} entries at a time.)
 
     # Run button
     can_run = 0 < len(st.session_state.pending_entries) <= MAX_ENTRIES_PER_RUN
@@ -341,7 +341,7 @@ def page_results():
     show_cols = ["entry_id", "solvent", "acid", "acid_mult", "degradation_hours", "closeness", "run_at"]
     st.dataframe(df[show_cols].sort_values("run_at"), use_container_width=True)
 
-    st.markdown("---")
+    st.title("---")
     st.subheader("View Spectrum for a Result")
     # pick an entry to plot
     entry_ids = [r["entry_id"] for r in st.session_state.results]
@@ -445,7 +445,7 @@ def main():
 
     # Render UI
     sidebar()
-    st.markdown(f"# {APP_TITLE}")
+    st.title(APP_TITLE)
 
     # Router
     page = st.session_state.page
