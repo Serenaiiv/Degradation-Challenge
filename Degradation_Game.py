@@ -267,10 +267,8 @@ def page_builder():
 
     # First visit: start timer
     start_timer_if_needed()
-    
-    st.image("Degradation_Scheme.png", caption=None, width="content", use_container_width=None)
 
-    # Selection widgets ``
+    # Selection widgets
     st.subheader("Select Conditions and Add as Entries")
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -278,7 +276,11 @@ def page_builder():
     with c2:
         acid = st.selectbox("Acid Type", ACIDS, index=0)
     with c3:
-        mult = st.selectbox("Acid Concentration (*molar excess of imine)", ACID_CONCENTRATION, index=2)
+        mult = st.selectbox(
+            "Acid Concentration (*molar excess of imine)",
+            ACID_CONCENTRATION,
+            index=2
+        )
 
     c4, c5 = st.columns([1, 1])
     with c4:
@@ -291,7 +293,7 @@ def page_builder():
                 added_at=datetime.utcnow().isoformat()
             ))
     with c5:
-        if st.button("Clear Entries"):
+        if st.button("🧹 Clear Pending"):
             st.session_state.pending_entries = []
 
     # Show pending entries
@@ -302,11 +304,12 @@ def page_builder():
     else:
         st.caption("No pending entries yet.")
 
-    # Run limit & button
+    # ✅ Run limit message (only appears on this page now)
     st.markdown(f"**You can run up to {MAX_ENTRIES_PER_RUN} entries at a time.**")
+
+    # Run button
     can_run = 0 < len(st.session_state.pending_entries) <= MAX_ENTRIES_PER_RUN
-    if st.button("Run Experiments", disabled=not can_run):
-        # simulate results for each pending entry
+    if st.button("▶️ Run Experiments", disabled=not can_run):
         rows = []
         for e in st.session_state.pending_entries:
             hours = base_degradation_time(e["solvent"], e["acid"], e["acid_mult"])
