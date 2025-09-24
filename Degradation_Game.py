@@ -7,7 +7,6 @@ import numpy as np
 import time
 import uuid
 from datetime import datetime
-from streamlit_extras.st_autorefresh import st_autorefresh
 
 # ----------------------------
 # APP-WIDE CONSTANTS (edit me)
