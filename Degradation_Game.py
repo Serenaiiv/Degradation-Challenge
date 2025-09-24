@@ -217,7 +217,7 @@ def page_survey():
     with col2:
         faculty = st.selectbox("Faculty", ["Undergraduate", "Graduate Student", "Postdoc", "Faculty/Staff", "Other"])
         experience = st.selectbox("Experience in polymer chemistry",
-                                  ["< 1 year", "1–3 years", "3–5 years", "5+ years", "None"])
+                                  ["None", "< 1 year", "1–3 years", "3–5 years", "5+ years"])
 
     # Label stays simple; the link is just above it
     consent = st.checkbox("I have read the Terms & Consent and I agree to participate.")
@@ -254,6 +254,14 @@ def page_instructions():
     )
     if not st.session_state.consented:
         st.info("Please complete the Survey and give consent before playing.")
+
+    if st.button("I understand. Let's start!"):
+        if not st.session_state.consented:
+            st.info("Please complete the Survey and give consent before playing.")
+        else:
+            st.success()
+            st.session_state.page = "Experiment Builder"
+            st.rerun()
 
 def page_builder():
     st.title("Experiment Builder")
