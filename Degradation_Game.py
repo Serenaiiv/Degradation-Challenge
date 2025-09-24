@@ -291,9 +291,6 @@ def page_builder():
     # Start timer on first entry to this page (only after consent)
     start_timer_if_needed()
 
-    # Optional: show a live timer at top of the page as well
-    st.info(f"⏱️ Elapsed: {pretty_hms(elapsed_seconds())}")
-
     # Selection widgets
     st.write("**Select Conditions and Add as Entries**")
     c1, c2, c3, c4 = st.columns(4)
