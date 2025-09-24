@@ -244,11 +244,11 @@ def page_instructions():
     st.subheader("Rules")
     st.title(
         """
-        - Build experiments on the **Experiment Builder** page.  
+        - Build experiments on the **"Experiment Builder"** page.  
         - You can add multiple entries; run them to see results.  
-        - Each run simulates spectra and a degradation time.  
+        - Each run will return spectra for your entries.  
         - No AI tools during gameplay. Take notes if you like.  
-        - When done, go to **End Experiment** to stop the timer and download your data.
+        - When done, go to **"End Experiment"** to stop the timer and download your data.
         """
     )
 
