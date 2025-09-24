@@ -205,11 +205,14 @@ def page_welcome():
         The goal of the study is establish performance benchmarks that would offer insights for the implementation of SDLs in polymer research.
         You will be 
         The approximate time to complete the game is 30-45 minutes.
-        Thank you for your pariticipation and contribution to this research project!
+        Your background information and game data will be collected for research purposes only (learn more about the terms and consent in the *Survey* page).
+        You can remain anonymous if you prefer.
+        Thank you for your pariticipation and contribution to SDL research!
 
         **Please proceed to the *Survey* to get started.**
         """)
-    if
+    if st.button("Survey", use_container_width=True):
+        st.session_state.page = "Survey"
 
 def page_survey():
     st.title("Survey")
