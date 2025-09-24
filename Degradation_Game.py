@@ -7,7 +7,6 @@ import numpy as np
 import time
 import uuid
 from datetime import datetime
-from streamlit_autorefresh import st_autorefresh
 
 # ----------------------------
 # APP-WIDE CONSTANTS (edit me)
@@ -180,7 +179,14 @@ def closeness_score(hours: float) -> float:
 # LAYOUT: SIDEBAR NAV + TIMER
 # ----------------------------
 def sidebar():
-    st.sidebar.markdown("### ⏱️ " + pretty_hms(elapsed_seconds()))
+    # live ticking timer in sidebar
+    timer_placeholder = st.sidebar.empty()
+    elapsed = int(elapsed_seconds())
+    h = elapsed // 3600
+    m = (elapsed % 3600) // 60
+    s = elapsed % 60
+    timer_placeholder.markdown(f"### ⏱️ {h:02d}:{m:02d}:{s:02d}")
+
     # page navigation
     pages = [
         "Survey",
@@ -200,7 +206,6 @@ def sidebar():
     st.sidebar.markdown("---")
     st.sidebar.caption("Tip: Timer starts when you first open *Experiment Builder* "
                        "and stops on *End Experiment*.")
-
 # ----------------------------
 # PAGES
 # ----------------------------
@@ -438,9 +443,12 @@ def page_end():
 def main():
     st.set_page_config(page_title=APP_TITLE, layout="wide")
     init_state()
-    if st.session_state.get("timer_running", False) and not st.session_state.get("ended", False):
-        st_autorefresh(interval=1000, key=f"tick-{st.session_state.session_id}")
     sidebar()
+
+    # ⏱️ keep the timer ticking: rerun the script every second while running
+    if st.session_state.get("timer_running", False) and not st.session_state.get("ended", False):
+        time.sleep(1)
+        st.rerun()   # or st.experimental_rerun() if your Streamlit version is <1.36
 
     # top header across pages
     st.markdown(f"# {APP_TITLE}")
@@ -461,6 +469,3 @@ def main():
         page_end()
     else:
         page_survey()
-
-if __name__ == "__main__":
-    main()
