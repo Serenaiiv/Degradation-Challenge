@@ -252,8 +252,6 @@ def page_instructions():
         - When done, go to **End Experiment** to stop the timer and download your data.
         """
     )
-    if not st.session_state.consented:
-        st.info("Please complete the Survey and give consent before playing.")
 
     if st.button("I understand. Let's start!"):
         if not st.session_state.consented:
