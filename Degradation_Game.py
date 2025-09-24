@@ -193,7 +193,7 @@ def sidebar():
             # This prevents pre-consent timer starts.
 
     st.sidebar.markdown("---")
-    st.sidebar.caption("Timer starts when you first open *Experiment Builder* (after consenting) and stops on *End Experiment*.")
+    st.sidebar.caption("⏱️ Timer starts when you first open *Experiment Builder* (after consenting) and stops on *End Experiment*.")
 
 
 
