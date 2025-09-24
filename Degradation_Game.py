@@ -288,12 +288,11 @@ def page_builder():
     with c4:
         if st.button("➕ Add Entry"):
             st.session_state.pending_entries.append(dict(
-                entry_ID=str(uuid.uuid4()),
+                entry_id=f"{st.session_state.survey.get('name','anon')}_{datetime.utcnow().strftime('%Y%m%d-%H%M%S')}",
                 solvent=solvent,
                 polymer_conc=conc,
                 acid=acid,
                 acid_conc=mult,
-                added_at=datetime.utcnow().strftime("%H:%M:%S")
             ))
     with c6:
         if st.button("🧹 Clear Pending"):
