@@ -231,8 +231,9 @@ def page_survey():
         if not consent:
             st.warning("Consent is required to continue.")
         else:
-            st.success("Saved. Use the left sidebar to continue.")
+            st.success("Consent recorded. Thank you!")
             st.session_state.page = "Instructions"
+            st.experimental_rerun()
 
 def page_instructions():
     st.title("Introduction & Game Rules")
