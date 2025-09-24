@@ -169,10 +169,9 @@ def closeness_score(hours: float) -> float:
 # LAYOUT: SIDEBAR NAV + TIMER
 # ----------------------------
 def sidebar():
-    # live time readout (it will tick because main() re-runs once/second while running)
+    # live time readout (ticks because main() re-runs while timer_running=True)
     st.sidebar.markdown("### ⏱️ " + pretty_hms(elapsed_seconds()))
 
-    # Pages and which ones require consent
     pages = [
         "Welcome",
         "Survey",
@@ -182,20 +181,20 @@ def sidebar():
         "Progress Tracker",
         "End Experiment",
     ]
+    # Gate the gameplay pages until consent
     requires_consent = {"Instructions", "Experiment Builder", "Experiment Results", "Progress Tracker", "End Experiment"}
     consented = st.session_state.get("consented", False)
 
-    # Render nav with consent gating
     for p in pages:
         disabled = (p in requires_consent) and (not consented)
         if st.sidebar.button(p, use_container_width=True, disabled=disabled):
             st.session_state.page = p
-            # Do NOT start timer here; only start inside page_builder() after consent check
+            # IMPORTANT: do NOT start the timer here; only in page_builder()
+            # This prevents pre-consent timer starts.
 
     st.sidebar.markdown("---")
-    st.sidebar.caption(
-        "Timer starts when you first open *Experiment Builder* (after consenting) and stops on *End Experiment*."
-    )
+    st.sidebar.caption("Timer starts when you first open *Experiment Builder* (after consenting) and stops on *End Experiment*.")
+
 
 
 # ----------------------------
@@ -289,8 +288,11 @@ def page_builder():
         st.warning("You must consent on the Survey page before playing.")
         return
 
-    # First visit: start timer
+    # Start timer on first entry to this page (only after consent)
     start_timer_if_needed()
+
+    # Optional: show a live timer at top of the page as well
+    st.info(f"⏱️ Elapsed: {pretty_hms(elapsed_seconds())}")
 
     # Selection widgets
     st.write("**Select Conditions and Add as Entries**")
@@ -306,6 +308,7 @@ def page_builder():
 
     st.caption("*Acid molar excess relative to imine groups in polymer.")
 
+    # Buttons aligned left and far-right
     col_left, col_spacer, col_right = st.columns([1, 3, 1])
     with col_left:
         if st.button("➕ Add Entry"):
@@ -315,7 +318,7 @@ def page_builder():
                 polymer_conc=conc,
                 acid=acid,
                 acid_conc=acid_conc,
-                added_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+                added_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
             ))
     with col_right:
         if st.button("🧹 Clear Pending"):
@@ -329,7 +332,7 @@ def page_builder():
     else:
         st.caption("No pending entries yet.")
 
-    # Run limit message (only appears on this page)
+    # Run limit message (only on this page)
     st.subheader(f"You can run up to {MAX_ENTRIES_PER_RUN} entries at a time.")
 
     # Run button
@@ -337,9 +340,9 @@ def page_builder():
     if st.button("▶️ Run Experiments", disabled=not can_run):
         rows = []
         for e in st.session_state.pending_entries:
-            # Use the stored keys consistently
+            # Use consistent keys (acid_conc) with the simulator
             hours = base_degradation_time(e["solvent"], e["acid"], e["acid_conc"])
-            spec = simulate_uvvis(hours)  # numpy array
+            spec = simulate_uvvis(hours)
             rows.append(dict(
                 session_id=st.session_state.session_id,
                 entry_id=e["entry_id"],
@@ -351,11 +354,12 @@ def page_builder():
                 closeness=closeness_score(hours),
                 wavelengths=";".join(map(str, WAVELENGTHS.tolist())),
                 absorbance=";".join(map(lambda x: f"{x:.4f}", spec.tolist())),
-                run_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+                run_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
             ))
         st.session_state.results.extend(rows)
         st.session_state.pending_entries = []
         st.success("Run complete! Check **Experiment Results** or **Progress Tracker**.")
+
 
 def page_results():
     st.header("Experiment Results")
@@ -496,13 +500,10 @@ def main():
 
  
     # After rendering everything, schedule a tick only if consented AND timer is running
-if (
-    st.session_state.get("consented", False)
-    and st.session_state.get("timer_running", False)
-    and not st.session_state.get("ended", False)
-):
+ if st.session_state.get("timer_running", False) and not st.session_state.get("ended", False):
     time.sleep(1)
     st.rerun()
+
 
 
 if __name__ == "__main__":
