@@ -27,7 +27,7 @@ ACID_CONCENTRATION = ["50x", "100x", "300x", "600x", "900x"]  # "x" relative to 
 def init_state():
     """Initialize session_state keys if absent."""
     ss = st.session_state
-    ss.setdefault("page", "Survey")
+    ss.setdefault("page", "Welcome")
     ss.setdefault("session_id", str(uuid.uuid4()))
     ss.setdefault("survey", {})  # dict of basic demographics
     ss.setdefault("consented", False)
@@ -97,7 +97,7 @@ def reset_for_new_attempt():
     # keep survey/consent so the user doesn't have to refill; uncomment to clear:
     # ss.survey = {}
     # ss.consented = False
-    ss.page = "Experiment Builder"  # jump right back to builder for a fresh run
+    ss.page = "Welcome"  # jump right back to builder for a fresh run
 
 # ----------------------------
 # SIMPLE SIMULATOR
@@ -196,6 +196,21 @@ def sidebar():
 # ----------------------------
 # PAGES
 # ----------------------------
+def page_welcome():
+    st.title("Welcome")
+    st. write(
+        """
+        **Welcome to the Degradation Challenge Game!**
+        This game is part of the human vs. robot research project for self-driving laboratores (SDLs) in polymer chemistry.
+        The goal of the study is establish performance benchmarks that would offer insights for the implementation of SDLs in polymer research.
+        You will be 
+        The approximate time to complete the game is 30-45 minutes.
+        Thank you for your pariticipation and contribution to this research project!
+
+        **Please proceed to the *Survey* to get started.**
+        """)
+    if
+
 def page_survey():
     st.title("Survey")
     st.write("Please complete the survey. Consent is required to proceed.")
