@@ -8,6 +8,7 @@ import time
 import uuid
 from datetime import datetime
 
+
 # ----------------------------
 # APP-WIDE CONSTANTS (edit me)
 # ----------------------------
@@ -179,14 +180,7 @@ def closeness_score(hours: float) -> float:
 # LAYOUT: SIDEBAR NAV + TIMER
 # ----------------------------
 def sidebar():
-    # live ticking timer in sidebar (updates each rerun)
-    timer_placeholder = st.sidebar.empty()
-    elapsed = int(elapsed_seconds())
-    h = elapsed // 3600
-    m = (elapsed % 3600) // 60
-    s = elapsed % 60
-    timer_placeholder.markdown(f"### ⏱️ {h:02d}:{m:02d}:{s:02d}")
-
+    st.sidebar.markdown("### ⏱️ " + pretty_hms(elapsed_seconds()))
     # page navigation
     pages = [
         "Survey",
@@ -199,13 +193,13 @@ def sidebar():
     for p in pages:
         if st.sidebar.button(p, use_container_width=True):
             st.session_state.page = p
-            # start timer only when entering the builder the first time
             if p == "Experiment Builder" and st.session_state.first_opened_builder_at is None:
                 st.session_state.first_opened_builder_at = datetime.utcnow().isoformat()
                 start_timer_if_needed()
 
     st.sidebar.markdown("---")
-    st.sidebar.caption("Timer starts on *Experiment Builder* and stops on *End Experiment*.")
+    st.sidebar.caption("Tip: Timer starts when you first open *Experiment Builder* "
+                       "and stops on *End Experiment*.")
 
 # ----------------------------
 # PAGES
@@ -442,13 +436,13 @@ def page_end():
 # MAIN
 # ----------------------------
 def main():
-    # IMPORTANT: keep this at the very top
     st.set_page_config(page_title=APP_TITLE, layout="wide")
-
     init_state()
-
-    # Render the app UI FIRST
+    if st.session_state.get("timer_running", False) and not st.session_state.get("ended", False):
+        st_autorefresh(interval=1000, key=f"tick-{st.session_state.session_id}")
     sidebar()
+
+    # top header across pages
     st.markdown(f"# {APP_TITLE}")
 
     # Router
@@ -468,7 +462,5 @@ def main():
     else:
         page_survey()
 
-    # 🔁 After all content is rendered, schedule the next tick if needed
-    if st.session_state.get("timer_running", False) and not st.session_state.get("ended", False):
-        time.sleep(1)
-        st.rerun()  # (use st.experimental_rerun() if you're on older Streamlit)
+if __name__ == "__main__":
+    main()
