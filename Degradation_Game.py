@@ -274,7 +274,7 @@ def page_builder():
     with c1:
         solvent = st.selectbox("Solvent", SOLVENTS, index=0)
     with c2:
-        conc = st.selectbox("Polymer Concentration", POLYMER_CONCENTRATION, index=0)
+        conc = st.selectbox("Polymer Concentration(mg/mL)", POLYMER_CONCENTRATION, index=0)
     with c3:
         acid = st.selectbox("Acid Type", ACIDS, index=0)
     with c4:
