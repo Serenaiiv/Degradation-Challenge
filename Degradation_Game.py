@@ -242,7 +242,7 @@ def page_instructions():
     )
 
     st.subheader("Rules")
-    st.title(
+    st.write(
         """
         - Build experiments on the **"Experiment Builder"** page.  
         - You can add multiple entries; run them to see results.  
@@ -305,7 +305,7 @@ def page_builder():
         st.caption("No pending entries yet.")
 
     # ✅ Run limit message (only appears on this page now)
-    st.title(You can run up to {MAX_ENTRIES_PER_RUN} entries at a time.)
+    st.title("You can run up to {MAX_ENTRIES_PER_RUN} entries at a time.")
 
     # Run button
     can_run = 0 < len(st.session_state.pending_entries) <= MAX_ENTRIES_PER_RUN
