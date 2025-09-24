@@ -8,7 +8,6 @@ import time
 import uuid
 from datetime import datetime
 
-
 # ----------------------------
 # APP-WIDE CONSTANTS (edit me)
 # ----------------------------
@@ -18,7 +17,7 @@ MAX_ENTRIES_PER_RUN = 5  # allow up to 5 per "batch" (paper-style)
 WAVELENGTHS = np.arange(300, 801, 2)  # 300–800 nm UV-Vis window
 
 SOLVENTS = ["2MeTHF", "Toluene", "Chloroform"]
-POLYMER_CONCENTRATION = [0.05, 0.]
+POLYMER_CONCENTRATION = [0.05, 0.0]  # placeholder; not yet used
 ACIDS = ["HCl", "TFA"]
 ACID_CONCENTRATION = ["50x", "100x", "300x", "600x", "900x"]  # "x" relative to imine
 
@@ -95,7 +94,7 @@ def reset_for_new_attempt():
     ss.timer_running = False
     ss.first_opened_builder_at = None
     ss.ended = False
-    # keep survey/consent so the user doesn't have to refill; remove next 2 lines if you want to clear survey too
+    # keep survey/consent so the user doesn't have to refill; uncomment to clear:
     # ss.survey = {}
     # ss.consented = False
     ss.page = "Experiment Builder"  # jump right back to builder for a fresh run
@@ -103,13 +102,6 @@ def reset_for_new_attempt():
 # ----------------------------
 # SIMPLE SIMULATOR
 # ----------------------------
-# We simulate two outputs for each entry:
-# (1) A "degradation_time_hours" — how long the reaction would take
-# (2) A synthetic UV-Vis spectrum reflecting "more degraded" (lower π-π* band)
-#
-# The mapping below is purely illustrative. You can tweak weights to make
-# certain combinations better/worse according to your domain knowledge.
-
 def base_degradation_time(solvent: str, acid: str, mult: str) -> float:
     """A small handcrafted landscape with local traps."""
     # start with a baseline
@@ -154,9 +146,6 @@ def simulate_uvvis(degradation_hours: float) -> np.ndarray:
     - More degraded (closer to target) -> lower peak intensity & slight red/blue shift.
     """
     lam = WAVELENGTHS
-
-    # peak center and height depend on degradation_hours
-    # target proximity modulates them
     diff = abs(degradation_hours - TARGET_HOURS)
 
     center = 550 + np.clip((TARGET_HOURS - degradation_hours) * 15, -25, 25)
@@ -180,7 +169,9 @@ def closeness_score(hours: float) -> float:
 # LAYOUT: SIDEBAR NAV + TIMER
 # ----------------------------
 def sidebar():
+    # live time readout (it will tick because main() re-runs once/second while running)
     st.sidebar.markdown("### ⏱️ " + pretty_hms(elapsed_seconds()))
+
     # page navigation
     pages = [
         "Survey",
@@ -198,8 +189,9 @@ def sidebar():
                 start_timer_if_needed()
 
     st.sidebar.markdown("---")
-    st.sidebar.caption("Tip: Timer starts when you first open *Experiment Builder* "
-                       "and stops on *End Experiment*.")
+    st.sidebar.caption(
+        "Tip: Timer starts when you first open *Experiment Builder* and stops on *End Experiment*."
+    )
 
 # ----------------------------
 # PAGES
@@ -208,7 +200,7 @@ def page_survey():
     st.title("Survey")
     st.write("Please provide basic info. Consent is required to proceed.")
 
-    # NEW: external link to your Terms/Consent page
+    # External link to your Terms/Consent page
     st.markdown(
         "📄 **Read the Terms & Consent**: "
         "[Terms](https://utoronto-my.sharepoint.com/:w:/g/personal/serenazuyun_qiu_mail_utoronto_ca/EVrw_cgiBVdGg7T7Jr5mqhABApoJ5u5QJ_3s_QIMAHcKYQ?e=Y6YXin)"
@@ -222,10 +214,10 @@ def page_survey():
         dept = st.text_input("Department/Discipline")
     with col2:
         faculty = st.selectbox("Faculty", ["Undergraduate", "Graduate Student", "Postdoc", "Faculty/Staff", "Other"])
-        experience = st.selectbox("Experience in polymer chemistry",
-                                  ["None", "< 1 year", "1–3 years", "3–5 years", "5+ years"])
+        experience = st.selectbox(
+            "Experience in polymer chemistry", ["None", "< 1 year", "1–3 years", "3–5 years", "5+ years"]
+        )
 
-    # Label stays simple; the link is just above it
     consent = st.checkbox("I have read the Terms & Consent and I agree to participate.")
 
     if st.button("Save and Continue"):
@@ -263,7 +255,6 @@ def page_instructions():
         if not st.session_state.consented:
             st.info("Please complete the Survey and give consent before playing.")
         else:
-            st.success("")
             st.session_state.page = "Experiment Builder"
             st.rerun()
 
@@ -310,7 +301,7 @@ def page_builder():
 
     # Run limit & button
     st.markdown(f"**You can run up to {MAX_ENTRIES_PER_RUN} entries at a time.**")
-    can_run = len(st.session_state.pending_entries) > 0 and len(st.session_state.pending_entries) <= MAX_ENTRIES_PER_RUN
+    can_run = 0 < len(st.session_state.pending_entries) <= MAX_ENTRIES_PER_RUN
     if st.button("▶️ Run Experiments", disabled=not can_run):
         # simulate results for each pending entry
         rows = []
@@ -355,8 +346,10 @@ def page_results():
     lam = np.array(list(map(float, rec["wavelengths"].split(";"))))
     absorb = np.array(list(map(float, rec["absorbance"].split(";"))))
 
-    st.caption(f"Solvent: {rec['solvent']} | Acid: {rec['acid']} | Conc: {rec['acid_mult']} "
-               f"| Degradation ~ {rec['degradation_hours']} h (closeness={rec['closeness']})")
+    st.caption(
+        f"Solvent: {rec['solvent']} | Acid: {rec['acid']} | Conc: {rec['acid_mult']} "
+        f"| Degradation ~ {rec['degradation_hours']} h (closeness={rec['closeness']})"
+    )
 
     # Plot with matplotlib (Streamlit integrates automatically)
     import matplotlib.pyplot as plt
@@ -383,7 +376,6 @@ def page_progress():
 
     # simple bar of closeness
     st.write("### Closeness to Target")
-    # draw a minimal progress-like bar: lower closeness is better; cap at 5h for visualization
     capped = float(np.clip(best["closeness"], 0, 5))
     pct = int((1 - capped / 5.0) * 100)
     st.progress(pct)
@@ -430,19 +422,23 @@ def page_end():
         st.info("No experiment results to export.")
 
     st.markdown("---")
-    st.caption("You can restart the app to play again, or refresh the page.")
+    # Optional: New Attempt button (resets state and goes back to Builder)
+    if st.button("🔁 New Attempt (clear results & restart timer)", use_container_width=True):
+        reset_for_new_attempt()
+        st.rerun()
+
+    st.caption("You can start a new attempt above or close the app.")
 
 # ----------------------------
 # MAIN
 # ----------------------------
 def main():
+    # Keep this at the top
     st.set_page_config(page_title=APP_TITLE, layout="wide")
     init_state()
-    if st.session_state.get("timer_running", False) and not st.session_state.get("ended", False):
-        st_autorefresh(interval=1000, key=f"tick-{st.session_state.session_id}")
-    sidebar()
 
-    # top header across pages
+    # Render UI
+    sidebar()
     st.markdown(f"# {APP_TITLE}")
 
     # Router
@@ -461,6 +457,11 @@ def main():
         page_end()
     else:
         page_survey()
+
+    # 🔁 After rendering everything, schedule a tick if the timer is running
+    if st.session_state.get("timer_running", False) and not st.session_state.get("ended", False):
+        time.sleep(1)
+        st.rerun()
 
 if __name__ == "__main__":
     main()
