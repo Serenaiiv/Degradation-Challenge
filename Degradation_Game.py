@@ -7,6 +7,7 @@ import numpy as np
 import time
 import uuid
 from datetime import datetime
+from streanlit_extras import st_autorefresh
 
 # ----------------------------
 # APP-WIDE CONSTANTS (edit me)
