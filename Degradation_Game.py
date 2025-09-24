@@ -307,7 +307,7 @@ def page_builder():
         st.caption("No pending entries yet.")
 
     # ✅ Run limit message (only appears on this page now)
-    st.subheader("You can run up to" {MAX_ENTRIES_PER_RUN} "entries at a time.")
+    st.subheader(f"You can run up to {MAX_ENTRIES_PER_RUN} entries at a time.")
 
     # Run button
     can_run = 0 < len(st.session_state.pending_entries) <= MAX_ENTRIES_PER_RUN
