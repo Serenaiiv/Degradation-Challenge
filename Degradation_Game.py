@@ -1,6 +1,5 @@
 # app.py
 # Streamlit MVP of a human "reaction/degradation optimization" game
-# Serena Qiu — minimal code, beginner friendly
 
 import streamlit as st
 import pandas as pd
