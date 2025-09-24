@@ -11,7 +11,7 @@ from datetime import datetime
 # ----------------------------
 # APP-WIDE CONSTANTS (edit me)
 # ----------------------------
-APP_TITLE = "Human Game Design – Degradation Optimization"
+APP_TITLE = "Degradation Challenge"
 TARGET_HOURS = 3.0  # objective: complete degradation at ~3 hours
 MAX_ENTRIES_PER_RUN = 5  # allow up to 5 per "batch" (paper-style)
 WAVELENGTHS = np.arange(300, 801, 2)  # 300–800 nm UV-Vis window
@@ -198,7 +198,7 @@ def sidebar():
 # ----------------------------
 def page_survey():
     st.title("Survey")
-    st.write("Please provide basic info. Consent is required to proceed.")
+    st.write("Please complete the survey. Consent is required to proceed.")
 
     # External link to your Terms/Consent page
     st.write(
