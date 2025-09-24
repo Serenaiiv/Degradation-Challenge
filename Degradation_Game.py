@@ -234,7 +234,7 @@ def page_survey():
             st.rerun()
 
 def page_instructions():
-    st.title("Introduction & Game Rules")
+    st.header("Introduction & Game Rules")
     st.subheader("Purpose")
     st.write(
         "Your goal is to choose experimental conditions that produce **complete degradation** "
@@ -260,7 +260,7 @@ def page_instructions():
             st.rerun()
 
 def page_builder():
-    st.title("Experiment Builder")
+    st.header("Experiment Builder")
     if not st.session_state.consented:
         st.warning("You must consent on the Survey page before playing.")
         return
@@ -307,7 +307,7 @@ def page_builder():
         st.caption("No pending entries yet.")
 
     # ✅ Run limit message (only appears on this page now)
-    st.header("You can run up to {MAX_ENTRIES_PER_RUN} entries at a time.")
+    st.subheader("You can run up to" {MAX_ENTRIES_PER_RUN} "entries at a time.")
 
     # Run button
     can_run = 0 < len(st.session_state.pending_entries) <= MAX_ENTRIES_PER_RUN
@@ -333,7 +333,7 @@ def page_builder():
         st.success("Run complete! Check **Experiment Results** or **Progress Tracker**.")
 
 def page_results():
-    st.title("Experiment Results")
+    st.header("Experiment Results")
     if not st.session_state.results:
         st.info("No results yet. Add entries and click **Run** on the Experiment Builder page.")
         return
@@ -369,7 +369,7 @@ def page_results():
     st.pyplot(fig)
 
 def page_progress():
-    st.title("Progress Tracker")
+    st.header("Progress Tracker")
     if not st.session_state.results:
         st.info("No results yet. Run some experiments first.")
         return
@@ -400,7 +400,7 @@ def page_progress():
     st.pyplot(fig)
 
 def page_end():
-    st.title("End Experiment")
+    st.header("End Experiment")
     if not st.session_state.ended:
         stop_timer()
         st.session_state.ended = True
