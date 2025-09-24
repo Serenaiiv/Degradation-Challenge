@@ -233,7 +233,7 @@ def page_survey():
         else:
             st.success("Consent recorded. Thank you!")
             st.session_state.page = "Instructions"
-            st.experimental_rerun()
+            st.rerun()
 
 def page_instructions():
     st.title("Introduction & Game Rules")
