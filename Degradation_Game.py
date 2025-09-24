@@ -500,9 +500,9 @@ def main():
 
  
     # After rendering everything, schedule a tick only if consented AND timer is running
- if st.session_state.get("timer_running", False) and not st.session_state.get("ended", False):
-    time.sleep(1)
-    st.rerun()
+    if st.session_state.get("timer_running", False) and not st.session_state.get("ended", False):
+        time.sleep(1)
+        st.rerun()
 
 
 
