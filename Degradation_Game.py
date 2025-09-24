@@ -240,7 +240,6 @@ def page_instructions():
         "Your goal is to choose experimental conditions that produce **complete degradation** "
         f"as close as possible to **{TARGET_HOURS} hours**."
     )
-    st.image(image, caption=None, width="content", use_column_width=None, clamp=False, channels="RGB", output_format="auto", *, use_container_width=None)
 
     st.subheader("Rules")
     st.markdown(
