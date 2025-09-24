@@ -205,7 +205,7 @@ def page_survey():
     # NEW: external link to your Terms/Consent page
     st.markdown(
         "📄 **Read the Terms & Consent**: "
-        "[link](https://utoronto-my.sharepoint.com/:w:/g/personal/serenazuyun_qiu_mail_utoronto_ca/EVrw_cgiBVdGg7T7Jr5mqhABApoJ5u5QJ_3s_QIMAHcKYQ?e=Y6YXin)"
+        "[Terms](https://utoronto-my.sharepoint.com/:w:/g/personal/serenazuyun_qiu_mail_utoronto_ca/EVrw_cgiBVdGg7T7Jr5mqhABApoJ5u5QJ_3s_QIMAHcKYQ?e=Y6YXin)"
     )
 
     col1, col2 = st.columns([1, 1])
