@@ -279,12 +279,12 @@ def page_builder():
         acid = st.selectbox("Acid Type", ACIDS, index=0)
     with c4:
         mult = st.selectbox(
-            "Acid Concentration (*molar excess of imine)",
+            "Acid Concentration*",
             ACID_CONCENTRATION,
             index=2
         )
 
-    c4, c5 = st.columns([1, 1])
+    c4, c5, c6 = st.columns([1, 3, 1])
     with c4:
         if st.button("➕ Add Entry"):
             st.session_state.pending_entries.append(dict(
@@ -294,7 +294,7 @@ def page_builder():
                 acid_mult=mult,
                 added_at=datetime.utcnow().isoformat()
             ))
-    with c5:
+    with c6:
         if st.button("🧹 Clear Pending"):
             st.session_state.pending_entries = []
 
