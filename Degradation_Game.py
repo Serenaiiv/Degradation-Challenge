@@ -288,7 +288,7 @@ def page_builder():
                 added_at=datetime.utcnow().isoformat()
             ))
     with c5:
-        if st.button("🧹 Clear Pending"):
+        if st.button("Clear Entries"):
             st.session_state.pending_entries = []
 
     # Show pending entries
@@ -302,7 +302,7 @@ def page_builder():
     # Run limit & button
     st.markdown(f"**You can run up to {MAX_ENTRIES_PER_RUN} entries at a time.**")
     can_run = 0 < len(st.session_state.pending_entries) <= MAX_ENTRIES_PER_RUN
-    if st.button("▶️ Run Experiments", disabled=not can_run):
+    if st.button("Run Experiments", disabled=not can_run):
         # simulate results for each pending entry
         rows = []
         for e in st.session_state.pending_entries:
