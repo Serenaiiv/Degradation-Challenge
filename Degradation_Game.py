@@ -17,7 +17,7 @@ MAX_ENTRIES_PER_RUN = 5  # allow up to 5 per "batch" (paper-style)
 WAVELENGTHS = np.arange(300, 801, 2)  # 300–800 nm UV-Vis window
 
 SOLVENTS = ["2MeTHF", "Toluene", "Chloroform"]
-POLYMER_CONCENTRATION = [0.05, 0.0]  # placeholder; not yet used
+POLYMER_CONCENTRATION = [0.01, 0.05, 0.10,]  # Need to confirm the UV-Vis spectra of the conc
 ACIDS = ["HCl", "TFA"]
 ACID_CONCENTRATION = ["50x", "100x", "300x", "600x", "900x"]  # "x" relative to imine
 
@@ -270,12 +270,14 @@ def page_builder():
 
     # Selection widgets
     st.subheader("Select Conditions and Add as Entries")
-    c1, c2, c3 = st.columns(3)
+    c1, c2, c3 = st.columns(4)
     with c1:
         solvent = st.selectbox("Solvent", SOLVENTS, index=0)
     with c2:
-        acid = st.selectbox("Acid Type", ACIDS, index=0)
+        polymer concentration = st.selectbox("Polymer Concentration", POLYMER_CONCENTRATION, index=0)
     with c3:
+        acid = st.selectbox("Acid Type", ACIDS, index=0)
+    with c4:
         mult = st.selectbox(
             "Acid Concentration (*molar excess of imine)",
             ACID_CONCENTRATION,
