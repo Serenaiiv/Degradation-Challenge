@@ -270,7 +270,7 @@ def page_builder():
 
     # Selection widgets
     st.subheader("Select Conditions and Add as Entries")
-    c1, c2, c3 = st.columns(4)
+    c1, c2, c3, c4 = st.columns(4)
     with c1:
         solvent = st.selectbox("Solvent", SOLVENTS, index=0)
     with c2:
