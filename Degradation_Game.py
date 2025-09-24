@@ -172,7 +172,7 @@ def sidebar():
     # live time readout (it will tick because main() re-runs once/second while running)
     st.sidebar.markdown("### ⏱️ " + pretty_hms(elapsed_seconds()))
 
-    # page navigation (include Welcome at the top)
+    # Pages and which ones require consent
     pages = [
         "Welcome",
         "Survey",
@@ -182,17 +182,21 @@ def sidebar():
         "Progress Tracker",
         "End Experiment",
     ]
+    requires_consent = {"Instructions", "Experiment Builder", "Experiment Results", "Progress Tracker", "End Experiment"}
+    consented = st.session_state.get("consented", False)
+
+    # Render nav with consent gating
     for p in pages:
-        if st.sidebar.button(p, use_container_width=True):
+        disabled = (p in requires_consent) and (not consented)
+        if st.sidebar.button(p, use_container_width=True, disabled=disabled):
             st.session_state.page = p
-            if p == "Experiment Builder" and st.session_state.first_opened_builder_at is None:
-                st.session_state.first_opened_builder_at = datetime.utcnow().isoformat()
-                start_timer_if_needed()
+            # Do NOT start timer here; only start inside page_builder() after consent check
 
     st.sidebar.markdown("---")
     st.sidebar.caption(
-        "Tip: Timer starts when you first open *Experiment Builder* and stops on *End Experiment*."
+        "Timer starts when you first open *Experiment Builder* (after consenting) and stops on *End Experiment*."
     )
+
 
 # ----------------------------
 # PAGES
@@ -490,10 +494,16 @@ def main():
     else:
         page_welcome()
 
-    # 🔁 After rendering everything, schedule a tick if the timer is running
-    if st.session_state.get("timer_running", False) and not st.session_state.get("ended", False):
-        time.sleep(1)
-        st.rerun()
+ 
+    # After rendering everything, schedule a tick only if consented AND timer is running
+    if (
+        st.session_state.get("consented", False)
+        and st.session_state.get("timer_running", False)
+        and not st.session_state.get("ended", False)
+):
+    time.sleep(1)
+    st.rerun()
+
 
 if __name__ == "__main__":
     main()
