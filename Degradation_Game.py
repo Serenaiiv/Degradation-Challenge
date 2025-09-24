@@ -259,7 +259,7 @@ def page_instructions():
         if not st.session_state.consented:
             st.info("Please complete the Survey and give consent before playing.")
         else:
-            st.success()
+            st.success("")
             st.session_state.page = "Experiment Builder"
             st.rerun()
 
