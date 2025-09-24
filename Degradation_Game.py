@@ -201,6 +201,13 @@ def sidebar():
 def page_survey():
     st.title("Survey")
     st.write("Please provide basic info. Consent is required to proceed.")
+
+    # NEW: external link to your Terms/Consent page
+    st.markdown(
+        "📄 **Read the Terms & Consent**: "
+        "[https://utoronto-my.sharepoint.com/:w:/g/personal/serenazuyun_qiu_mail_utoronto_ca/EVrw_cgiBVdGg7T7Jr5mqhABApoJ5u5QJ_3s_QIMAHcKYQ?e=Y6YXin](https://utoronto-my.sharepoint.com/:w:/g/personal/serenazuyun_qiu_mail_utoronto_ca/EVrw_cgiBVdGg7T7Jr5mqhABApoJ5u5QJ_3s_QIMAHcKYQ?e=Y6YXin)"
+    )
+
     col1, col2 = st.columns([1, 1])
     with col1:
         name = st.text_input("Name")
@@ -211,7 +218,9 @@ def page_survey():
         faculty = st.selectbox("Faculty", ["Undergraduate", "Graduate Student", "Postdoc", "Faculty/Staff", "Other"])
         experience = st.selectbox("Experience in polymer chemistry",
                                   ["< 1 year", "1–3 years", "3–5 years", "5+ years", "None"])
-    consent = st.checkbox("I have read the information and I consent to participate.")
+
+    # Label stays simple; the link is just above it
+    consent = st.checkbox("I have read the Terms & Consent and I agree to participate.")
 
     if st.button("Save and Continue"):
         st.session_state.survey = dict(
