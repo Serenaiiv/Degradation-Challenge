@@ -431,11 +431,11 @@ def page_end():
 
     st.markdown("---")
     # Optional: New Attempt button (resets state and goes back to Builder)
-    if st.button("New Attempt (clear results & restart timer)", use_container_width=True):
+    if st.button("New Attempt", use_container_width=True):
         reset_for_new_attempt()
         st.rerun()
 
-    st.caption("You can start a new attempt above (redirects to *Experiment Builder*) or close the app.")
+    st.caption("You can start a new attempt above (redirects to *Experiment Builder* and restarts the timer) or close the app.")
 
 # ----------------------------
 # MAIN
