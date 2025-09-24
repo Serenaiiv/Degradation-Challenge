@@ -288,7 +288,7 @@ def page_builder():
     with c4:
         if st.button("➕ Add Entry"):
             st.session_state.pending_entries.append(dict(
-                entry_id=f"{st.session_state.survey.get('name','anon')}_{datetime.utcnow().strftime('%Y%m%d-%H%M%S')}",
+                entry_id=f"{st.session_state.survey.get('name','anon')}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
                 solvent=solvent,
                 polymer_conc=conc,
                 acid=acid,
@@ -431,11 +431,11 @@ def page_end():
 
     st.markdown("---")
     # Optional: New Attempt button (resets state and goes back to Builder)
-    if st.button("🔁 New Attempt (clear results & restart timer)", use_container_width=True):
+    if st.button("New Attempt (clear results & restart timer)", use_container_width=True):
         reset_for_new_attempt()
         st.rerun()
 
-    st.caption("You can start a new attempt above or close the app.")
+    st.caption("You can start a new attempt above (redirects to *Experiment Builder*) or close the app.")
 
 # ----------------------------
 # MAIN
