@@ -198,7 +198,7 @@ def sidebar():
 # PAGES
 # ----------------------------
 def page_welcome():
-    st.title("Welcome")
+    st.markdown("## Welcome")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.image("robot_vs_human_welcome.png", width=700)
