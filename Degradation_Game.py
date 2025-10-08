@@ -277,6 +277,9 @@ def page_builder():
     # Start timer on first entry to this page (only after consent)
     start_timer_if_needed()
 
+    st.write("**Polymer degradtion scheme**")
+    st.image("Segradation_Scheme.png", width=1500)
+
     # Selection widgets
     st.write("**Select Conditions and Add as Entries**")
     c1, c2, c3, c4, c5 = st.columns(5)
