@@ -199,7 +199,7 @@ def sidebar():
 # ----------------------------
 def page_welcome():
     st.title("Welcome")
-    st.image("robot_vs_human_welcome.png", use_column_width=True)
+    st.image("robot_vs_human_welcome.png", width=500)
     st.write(
         """
 **Welcome to the Degradation Challenge Game!**  
