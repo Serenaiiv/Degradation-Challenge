@@ -197,7 +197,7 @@ If you have questions, contact Serena: serenazuyun.qiu@mail.utoronto.ca
 **When you’re ready, continue to the Survey.**
         """
     )
-    if st.button("➡️ Go to Survey", use_container_width=True):
+    if st.button("Go to Survey", use_container_width=True):
         st.session_state.page = "Survey"
         st.rerun()
 
