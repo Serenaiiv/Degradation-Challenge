@@ -10,7 +10,7 @@ from datetime import datetime
 # ----------------------------
 APP_TITLE = "Degradation Challenge Game"
 TARGET_HOURS = 3.0  # objective: complete degradation at ~3 hours
-MAX_ENTRIES_PER_RUN = 5  # allow up to 5 per "batch" (paper-style)
+MAX_ENTRIES_PER_RUN = 3  # allow up to 3 per "batch" (paper-style)
 WAVELENGTHS = np.arange(300, 801, 2)  # 300–800 nm UV-Vis window
 
 SOLVENTS = ["2MeTHF", "Toluene", "Chloroform"]
