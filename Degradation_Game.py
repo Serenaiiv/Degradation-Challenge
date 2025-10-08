@@ -245,10 +245,10 @@ def page_instructions():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.image("degradation_question.png", width=1000)
-    st.write("**p(IDT-TIT) Strcuture**.")
+    st.write("**p(IDT-TIT) Strcuture:**")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.image("p(IDT-TIT)_structure.png", width=2000)
+        st.image("p(IDT-TIT)_structure.png", width=3000)
     
 
     st.subheader("Rules")
