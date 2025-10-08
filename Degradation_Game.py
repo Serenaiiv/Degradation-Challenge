@@ -278,7 +278,7 @@ def page_builder():
     start_timer_if_needed()
 
     st.write("**Polymer degradtion scheme**")
-    st.image("Segradation_Scheme.png", width=1500)
+    st.image("Degradation_Scheme.png", width=1500)
 
     # Selection widgets
     st.write("**Select Conditions and Add as Entries**")
