@@ -201,7 +201,7 @@ def page_welcome():
     st.title("Welcome")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.image("robot_vs_human_welcome.png", width=500)
+        st.image("robot_vs_human_welcome.png", width=350)
     st.write(
         """
 **Welcome to the Degradation Challenge Game!**  
