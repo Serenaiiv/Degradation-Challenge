@@ -244,7 +244,7 @@ def page_instructions():
     st.write("You are a chemist investigating the degradation of 𝜋-conjugated polymers. You are asked to find out the solution for the question below: ")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.image("degradation_question.png", width=700)
+        st.image("degradation_question.png", width=900)
     st.write(
     "Your goal is to choose experimental conditions that produce **complete degradation** "
     f"as close as possible to **{TARGET_HOURS} hours**.")
