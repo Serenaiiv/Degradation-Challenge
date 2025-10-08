@@ -218,7 +218,7 @@ def page_survey():
         inst = st.text_input("Institution")
         dept = st.text_input("Department/Discipline")
     with col2:
-        faculty = st.selectbox("Faculty", ["Undergraduate", "Graduate Student", "Postdoc", "Faculty/Staff", "Other"])
+        role = st.selectbox("Role", ["Undergraduate", "Graduate Student", "Postdoc", "Faculty/Staff", "Other"])
         experience = st.selectbox(
             "Experience in polymer chemistry", ["None", "< 1 year", "1–3 years", "3–5 years", "5+ years"]
         )
@@ -228,7 +228,7 @@ def page_survey():
     if st.button("Save and Continue"):
         st.session_state.survey = dict(
             name=name, email=email, institution=inst, department=dept,
-            faculty=faculty, experience=experience
+            role=role, experience=experience
         )
         st.session_state.consented = bool(consent)
         if not consent:
@@ -408,6 +408,9 @@ def page_end():
     # Assemble all data for export (survey + results)
     results = pd.DataFrame(st.session_state.results)
     if not results.empty:
+        # Add a column for the date the record is reported
+        report_date = datetime.now().strftime('%Y-%m-%d')
+        results.insert(0, 'report_date', report_date)
         results = results.assign(
             participant_name=st.session_state.survey.get("name", ""),
             participant_email=st.session_state.survey.get("email", ""),
@@ -423,6 +426,22 @@ def page_end():
             mime="text/csv",
             use_container_width=True
         )
+
+        # --- Microsoft Excel Export (append to one file for all players) ---
+        try:
+            import openpyxl
+            excel_filename = "game_results_all_players.xlsx"
+            from pathlib import Path
+            if Path(excel_filename).exists():
+                # Load existing file and append
+                existing = pd.read_excel(excel_filename)
+                combined = pd.concat([existing, results], ignore_index=True)
+                combined.to_excel(excel_filename, index=False)
+            else:
+                results.to_excel(excel_filename, index=False)
+            st.success(f"Results appended to Excel file: {excel_filename}")
+        except Exception as e:
+            st.warning(f"Excel export failed: {e}")
     else:
         st.info("No experiment results to export.")
 
