@@ -183,12 +183,16 @@ def page_welcome():
     st.write(
         """
 **Welcome to the Degradation Challenge Game!**  
-This game is part of a research project in Team Tran on decision-making for self-driving laboratories (SDLs) in polymer chemistry.  
-Your goal will be to choose experimental conditions to achieve **complete degradation** close to a **target of 3 hours**.
+This is a simulation game to simulate setting up and running experiments to study pi-conjugated polymer degradation. 
+This game is part of a research project in Team Tran on comparing decision-making of human scientist vs self-driving laboratories (SDLs) in polymer chemistry.  
 
-- Estimated time: > 30 minutes  
-- Your background info and game data are for research only (see Terms & Consent in the **Survey**).  
-- You may remain anonymous if you prefer.
+- Estimated time to complete the game: >30 minutes  
+- We will collect your background info and game data for research (see Terms & Consent in the **Survey**).
+- You may remain anonymous if you prefer but we do ask for your educational background to better evaluate human scientist performance.
+
+Please find the instrctions of the game in the **Instructions** page after completing the **Survey** and giving consent.
+
+If you have questions, contact Serena: serenazuyun.qiu@mail.utoronto.ca
 
 **When you’re ready, continue to the Survey.**
         """
