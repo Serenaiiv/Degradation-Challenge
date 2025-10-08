@@ -183,7 +183,7 @@ def page_welcome():
     st.write(
         """
 **Welcome to the Degradation Challenge Game!**  
-This is a simulation game to simulate setting up and running experiments to study pi-conjugated polymer degradation. 
+This is a game to simulate setting up and running experiments to study pi-conjugated polymer degradation. 
 This game is part of a research project in Team Tran on comparing decision-making of human scientist vs self-driving laboratories (SDLs) in polymer chemistry.  
 
 - Estimated time to complete the game: >30 minutes  
@@ -241,10 +241,14 @@ def page_survey():
 def page_instructions():
     st.header("Introduction & Game Rules")
     st.subheader("Purpose")
+    st.write("You are a chemist investigating the degradation of 𝜋-conjugated polymers. You are asked to find out the solution for the question below: ")
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.image("degradation_question.png", width=700)
     st.write(
-        "Your goal is to choose experimental conditions that produce **complete degradation** "
-        f"as close as possible to **{TARGET_HOURS} hours**."
-    )
+    "Your goal is to choose experimental conditions that produce **complete degradation** "
+    f"as close as possible to **{TARGET_HOURS} hours**.")
+
 
     st.subheader("Rules")
     st.write(
