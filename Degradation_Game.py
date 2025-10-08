@@ -190,7 +190,7 @@ This game is part of a research project in Team Tran on comparing decision-makin
 - We will collect your background info and game data for research (see Terms & Consent in the **Survey**).
 - You may remain anonymous if you prefer but we do ask for your educational background to better evaluate human scientist performance.
 
-Please find the instrctions of the game in the **Instructions** page after completing the **Survey** and giving consent.
+Please find the instructions of the game in the **Instructions** page after completing the **Survey** and giving consent.
 
 If you have questions, contact Serena: serenazuyun.qiu@mail.utoronto.ca
 
