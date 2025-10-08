@@ -355,9 +355,9 @@ def page_results():
     sel = st.selectbox("Choose an entry", entry_ids)
     rec = next(r for r in st.session_state.results if r["entry_id"] == sel)
     spectrum_hour = rec["spectrum_hour"]
-    # Display photo based on spectrum_hour selection
-    # Example: photo filenames should be like 'spectrum_0.5.png', 'spectrum_1.0.png', etc.
-    photo_filename = f"spectrum_{spectrum_hour}.png"
+    # New photo filename format: solvent_polymerconc_acid_acidconc_spectrumhour.png
+    # e.g. toluene_0.5_HCl_100x_3.0.png
+    photo_filename = f"{rec['solvent']}_{rec['polymer_conc']}_{rec['acid']}_{rec['acid_conc']}_{spectrum_hour}.png"
     try:
         st.image(photo_filename, caption=f"Spectrum at {spectrum_hour} hours", use_column_width=True)
     except Exception:
@@ -370,6 +370,13 @@ def page_progress():
         return
 
     df = pd.DataFrame(st.session_state.results)
+    total_entries = len(df)
+    # Each experiment is a batch/run, so count unique run_at timestamps
+    total_experiments = df['run_at'].nunique() if not df.empty else 0
+
+    st.metric(label="Total Entries", value=total_entries)
+    st.metric(label="Total Experiments", value=total_experiments)
+
     best_idx = df["closeness"].idxmin()
     best = df.loc[best_idx]
 
@@ -383,15 +390,16 @@ def page_progress():
     pct = int((1 - capped / 5.0) * 100)
     st.progress(pct)
 
-    # history chart (degradation hours across runs)
-    st.write("### Degradation Time Across Results")
+    # Dot plot: experiment number vs. degradation time
+    st.write("### Experiment Number vs. Degradation Time (Dot Plot)")
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
-    ax.plot(np.arange(1, len(df) + 1), df["degradation_hours"].astype(float), marker="o")
-    ax.axhline(TARGET_HOURS, linestyle="--")
-    ax.set_xlabel("Result #")
+    ax.scatter(np.arange(1, len(df) + 1), df["degradation_hours"].astype(float), color='blue')
+    ax.axhline(TARGET_HOURS, linestyle="--", color='red', label='Target')
+    ax.set_xlabel("Experiment Number")
     ax.set_ylabel("Degradation time (h)")
-    ax.set_title("History")
+    ax.set_title("Degradation Time per Entry")
+    ax.legend()
     st.pyplot(fig)
 
 def page_end():
