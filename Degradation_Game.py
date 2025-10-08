@@ -1,6 +1,3 @@
-# app.py
-# Streamlit MVP of a human "reaction/degradation optimization" game
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -202,13 +199,14 @@ def sidebar():
 # ----------------------------
 def page_welcome():
     st.title("Welcome")
+    st.image("robot_vs_human_welcome.png", use_column_width=True)
     st.write(
         """
 **Welcome to the Degradation Challenge Game!**  
-This game is part of a research project on decision-making for self-driving laboratories (SDLs) in polymer chemistry.  
+This game is part of a research project in Team Tran on decision-making for self-driving laboratories (SDLs) in polymer chemistry.  
 Your goal will be to choose experimental conditions to achieve **complete degradation** close to a **target of 3 hours**.
 
-- Estimated time: 30–45 minutes  
+- Estimated time: > 30 minutes  
 - Your background info and game data are for research only (see Terms & Consent in the **Survey**).  
 - You may remain anonymous if you prefer.
 
