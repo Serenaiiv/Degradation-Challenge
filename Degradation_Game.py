@@ -136,28 +136,6 @@ def base_degradation_time(solvent: str, acid: str, mult: str) -> float:
     t = max(0.4, t + noise)
     return float(np.round(t, 2))
 
-def simulate_uvvis(degradation_hours: float) -> np.ndarray:
-    """
-    Make a synthetic spectrum:
-    - Start with a Gaussian 'π-π*' band; degrading shifts/lowers it.
-    - More degraded (closer to target) -> lower peak intensity & slight red/blue shift.
-    """
-    lam = WAVELENGTHS
-    diff = abs(degradation_hours - TARGET_HOURS)
-
-    center = 550 + np.clip((TARGET_HOURS - degradation_hours) * 15, -25, 25)
-    height = 1.0 / (1.0 + 0.4 * diff)  # lower when closer to target
-    width = 60 + 10 * np.clip(diff, 0, 5)
-
-    band = height * np.exp(-0.5 * ((lam - center) / width) ** 2)
-
-    # add shoulder + baseline
-    shoulder = 0.3 * height * np.exp(-0.5 * ((lam - (center + 110)) / (width + 30)) ** 2)
-    baseline = 0.03 + 0.01 * np.sin(lam / 18.0)
-
-    spectrum = band + shoulder + baseline + np.random.normal(0, 0.005, size=len(lam))
-    return spectrum
-
 # score: closeness to 3h (lower is better)
 def closeness_score(hours: float) -> float:
     return float(np.round(abs(hours - TARGET_HOURS), 3))
@@ -220,7 +198,7 @@ Your goal will be to choose experimental conditions to achieve **complete degrad
         st.rerun()
 
 def page_survey():
-    st.title("Survey")
+    st.markdown("## Survey")
     st.write("Please complete the survey. Consent is required to proceed.")
 
     # External link to your Terms/Consent page
@@ -293,7 +271,7 @@ def page_builder():
 
     # Selection widgets
     st.write("**Select Conditions and Add as Entries**")
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3, c4, c5 = st.columns(5)
     with c1:
         solvent = st.selectbox("Solvent", SOLVENTS, index=0)
     with c2:
@@ -302,19 +280,22 @@ def page_builder():
         acid = st.selectbox("Acid Type", ACIDS, index=0)
     with c4:
         acid_conc = st.selectbox("Acid Concentration*", ACID_CONCENTRATION, index=2)
+    with c5:
+        spectrum_hour = st.selectbox("Spectrum Hour to View", [0.5, 1.0, 2.0, 3.0, 4.0, 5.0], index=3)
 
     st.caption("*Acid molar excess relative to imine groups in polymer.")
 
     # Buttons aligned left and far-right
     col_left, col_spacer, col_right = st.columns([1, 3, 1])
     with col_left:
-        if st.button("➕ Add Entry"):
+        if st.button("Add Entry"):
             st.session_state.pending_entries.append(dict(
                 entry_id=f"{st.session_state.survey.get('name','anon')}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
                 solvent=solvent,
                 polymer_conc=conc,
                 acid=acid,
                 acid_conc=acid_conc,
+                spectrum_hour=spectrum_hour,
                 added_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
             ))
     with col_right:
@@ -337,9 +318,7 @@ def page_builder():
     if st.button("▶️ Run Experiments", disabled=not can_run):
         rows = []
         for e in st.session_state.pending_entries:
-            # Use consistent keys (acid_conc) with the simulator
             hours = base_degradation_time(e["solvent"], e["acid"], e["acid_conc"])
-            spec = simulate_uvvis(hours)
             rows.append(dict(
                 session_id=st.session_state.session_id,
                 entry_id=e["entry_id"],
@@ -347,10 +326,9 @@ def page_builder():
                 polymer_conc=e["polymer_conc"],
                 acid=e["acid"],
                 acid_conc=e["acid_conc"],
+                spectrum_hour=e["spectrum_hour"],
                 degradation_hours=hours,
                 closeness=closeness_score(hours),
-                wavelengths=";".join(map(str, WAVELENGTHS.tolist())),
-                absorbance=";".join(map(lambda x: f"{x:.4f}", spec.tolist())),
                 run_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
             ))
         st.session_state.results.extend(rows)
@@ -366,35 +344,24 @@ def page_results():
 
     # Table of results
     df = pd.DataFrame(st.session_state.results)
-    show_cols = ["entry_id", "solvent", "polymer_conc", "acid", "acid_conc",
+    show_cols = ["entry_id", "solvent", "polymer_conc", "acid", "acid_conc", "spectrum_hour",
                  "degradation_hours", "closeness", "run_at"]
     st.dataframe(df[show_cols].sort_values("run_at"), use_container_width=True)
 
+    # Display corresponding photo for each entry's selected spectrum hour
     st.markdown("---")
-    st.subheader("View Spectrum for a Result")
-
-    # pick an entry to plot
+    st.subheader("View Spectrum Photo for a Result")
     entry_ids = [r["entry_id"] for r in st.session_state.results]
     sel = st.selectbox("Choose an entry", entry_ids)
-
     rec = next(r for r in st.session_state.results if r["entry_id"] == sel)
-    lam = np.array(list(map(float, rec["wavelengths"].split(";"))))
-    absorb = np.array(list(map(float, rec["absorbance"].split(";"))))
-
-    st.caption(
-        f"Solvent: {rec['solvent']} | Polymer Conc: {rec['polymer_conc']} mg/mL | "
-        f"Acid: {rec['acid']} ({rec['acid_conc']}) | "
-        f"Degradation ~ {rec['degradation_hours']} h (closeness={rec['closeness']})"
-    )
-
-    # Plot with matplotlib (Streamlit integrates automatically)
-    import matplotlib.pyplot as plt
-    fig, ax = plt.subplots()
-    ax.plot(lam, absorb)
-    ax.set_xlabel("Wavelength (nm)")
-    ax.set_ylabel("Absorbance (a.u.)")
-    ax.set_title("Simulated UV–Vis Spectrum")
-    st.pyplot(fig)
+    spectrum_hour = rec["spectrum_hour"]
+    # Display photo based on spectrum_hour selection
+    # Example: photo filenames should be like 'spectrum_0.5.png', 'spectrum_1.0.png', etc.
+    photo_filename = f"spectrum_{spectrum_hour}.png"
+    try:
+        st.image(photo_filename, caption=f"Spectrum at {spectrum_hour} hours", use_column_width=True)
+    except Exception:
+        st.warning(f"Photo for {spectrum_hour} hours not found: {photo_filename}")
 
 def page_progress():
     st.header("Progress Tracker")
@@ -442,7 +409,7 @@ def page_end():
         results = results.assign(
             participant_name=st.session_state.survey.get("name", ""),
             participant_email=st.session_state.survey.get("email", ""),
-            session_id=st.session_state.session_id,
+            session_id=st.session_id,
             total_time_hms=total_time
         )
 
