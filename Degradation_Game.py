@@ -377,18 +377,8 @@ def page_progress():
     st.metric(label="Total Entries", value=total_entries)
     st.metric(label="Total Experiments", value=total_experiments)
 
-    best_idx = df["closeness"].idxmin()
-    best = df.loc[best_idx]
-
     st.metric(label="Target (hours)", value=f"{TARGET_HOURS:.1f}")
-    st.metric(label="Best so far (hours)", value=f"{best['degradation_hours']:.2f}")
-    st.metric(label="Closeness (|best - target|, ↓ better)", value=f"{best['closeness']:.3f}")
 
-    # simple bar of closeness
-    st.write("### Closeness to Target")
-    capped = float(np.clip(best["closeness"], 0, 5))
-    pct = int((1 - capped / 5.0) * 100)
-    st.progress(pct)
 
     # Dot plot: experiment number vs. degradation time
     st.write("### Experiment Number vs. Degradation Time (Dot Plot)")
